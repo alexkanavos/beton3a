@@ -2,45 +2,46 @@
 #include "footingsystem.h"
 #include <iostream>
 #include <cmath>
+#include <iomanip>
 
 void initializer(Footingsystem& ref)
 {
 	std::cout << "Insert required input values. \n";
 
-	std::cout << "bx: ";
+	std::cout << "bx   = ";
     std::cin >> ref.bx;
     
-    std::cout << "by: ";
+    std::cout << "by   = ";
     std::cin >> ref.by;
     
-    std::cout << "h: ";
+    std::cout << "h    = ";
     std::cin >> ref.h;
 
-    std::cout << "d: ";
+    std::cout << "d    = ";
     std::cin >> ref.d;
 
-    std::cout << "cx: ";
+    std::cout << "cx   = ";
     std::cin >> ref.cx;
     
-    std::cout << "cy: ";
+    std::cout << "cy   = ";
     std::cin >> ref.cy;
     
-    std::cout << "ax: ";
+    std::cout << "ax   = ";
     std::cin >> ref.ax;
     
-    std::cout << "ay: ";
+    std::cout << "ay   = ";
     std::cin >> ref.ay;
 
-    std::cout << "t: ";
+    std::cout << "t    = ";
     std::cin >> ref.t;
     
-    std::cout << "Mx: ";
+    std::cout << "Mx   = ";
     std::cin >> ref.Mx;
     
-    std::cout << "My: ";
+    std::cout << "My   = ";
     std::cin >> ref.My;
 
-    std::cout << "Ntot: ";
+    std::cout << "Ntot = ";
     std::cin >> ref.Ntot;
 }
 
@@ -48,8 +49,8 @@ double vRdc(double a, const Footingsystem& ref)
 {
 	double p1{(0.18/1.5) * std::pow(100.0 * constants::rho1, 1.0/3.0)};
 	double p2{1.0 + std::sqrt(0.2/ref.d)};
-	double p3{0.035 * std::sqrt(p2) * std::pow(constants::f_ck, 1.0/6.0)};
-	double p4{pow(constants::f_ck, 1.0/3.0) * 2 * ref.d/a};
+	double p3{0.035 * std::sqrt(p2) * std::pow(ref.f_ck, 1.0/6.0)};
+	double p4{pow(ref.f_ck, 1.0/3.0) * 2 * ref.d/a};
 	double result{std::max(p1, p3) * p2 * p4};
 	return result;
 }
@@ -160,63 +161,126 @@ double e_y_red(double medyred, double vedred)
 	return medyred / vedred;
 }
 
-double betaFun(double exred, double eyred, double u, double wx, double wy, double a, const Footingsystem& ref)
+double betaFun(double exred, double eyred, double a, double u, double wx, double wy, const Footingsystem& ref)
 {
-	double result{};
 	if (exred > 0 && eyred == 0)
 	{
-		double logos{ref.cx / ref.cy};
-		double k{};
-		double* ptr{&k};
-		if (logos <= 0.5)
+		double ratio{ref.cx / ref.cy};
+		if (ratio <= 0.5)
 		{
-			*ptr = 0.45;
+			double k{0.45};
+			return 1.0 + k * exred * u * wx;
 		}
-		else if (logos = 1.0)
+		else if (ratio == 1.0)
 		{
-			*ptr = 0.60;
+			double k{0.60};
+			return 1.0 + k * exred * u * wx;
 		}
-		else if (logos = 2.0)
+		else if (ratio == 2.0)
 		{
-			*ptr = 0.70;
+			double k{0.70};
+			return 1.0 + k * exred * u * wx;
 		}
-		else if (logos >= 3.0)
+		else if (ratio >= 3.0)
 		{
-			*ptr = 0.80;
+			double k{0.80};
+			return 1.0 + k * exred * u * wx;
 		}
+	}
+	
+	else if (exred == 0 && eyred > 0)
+	{
+		double ratio{ref.cy / ref.cx};
+		if (ratio <= 0.5)
+		{
+			double k{0.45};
+			return 1.0 + k * eyred * u * wy;
+		}
+		else if (ratio == 1.0)
+		{
+			double k{0.60};
+			return 1.0 + k * eyred * u * wy;
+		}
+		else if (ratio == 2.0)
+		{
+			double k{0.70};
+			return 1.0 + k * eyred * u * wy;
+		}
+		else if (ratio >= 3.0)
+		{
+			double k{0.80};
+			return 1.0 + k * eyred * u * wy;
+		}
+	}
+	
+	else if (exred > 0 && eyred > 0)
+	{
+		double p1{std::pow(exred / (ref.cy + 2.0 * a), 2)};
+		double p2{std::pow(eyred / (ref.cx + 2.0 * a), 2)};
+		double p3{std::sqrt(p1 + p2)};
+		return 1.0 + 1.8 * p3;
+	}
+}
+
+double limitFinder(const Footingsystem& ref)
+{
+	double pos_x{ref.bx / 2.0 - ref.ax - ref.cx / 2.0};
+	double neg_x{ref.bx / 2.0 + ref.ax - ref.cx / 2.0};
+	double pos_y{ref.by / 2.0 - ref.ay - ref.cy / 2.0};
+	double neg_y{ref.bx / 2.0 + ref.ax - ref.cx / 2.0};
+	double min_x{std::min(pos_x, neg_x)};
+	double min_y{std::min(pos_y, neg_y)};
+	return std::min(min_x, min_y);
+}
+
+void printer(const Footingsystem& ref)
+{
+	double a{0.0};
+	const double* ptrIncr{&constants::step};
+	const double* ptrStepError{&constants::stepError};
+	double limit_equation{2.0 * ref.d};
+	double limit_geometry{limitFinder(ref)};
+	
+	while(a <= limit_equation)
+	{
 		
- 		result = 1.0 + k * exred * u / wx;
- 	}
- 	else if (exred == 0 && eyred > 0)
- 	{
- 		double logos{ref.cy / ref.cx};
- 		double k{};
-		double* ptr{&k};
-		if (logos <= 0.5)
-		{
-			*ptr = 0.45;
-		}
-		else if (logos = 1.0)
-		{
-			*ptr = 0.60;
-		}
-		else if (logos = 2.0)
-		{
-			*ptr = 0.70;
-		}
-		else if (logos >= 3.0)
-		{
-			*ptr = 0.80;
-		}
+		std::cout << limit_geometry - a << "Distance from column: [a = " << a << "] --> ";
 		
- 		result = 1.0 + k * eyred * u / wy;
- 	}
-    else if (exred > 0 && eyred > 0)
-    {
-    	double p1{std::pow(exred/(ref.cy + 2.0 * a), 2)};
-    	double p2{std::pow(eyred/(ref.cx + 2.0 * a), 2)};
-    	double p3{std::sqrt(p1 + p2)};
-    	return 1.0 + 1.8 * p3;
-    }
-    return result;
+		if (((limit_geometry - a) > *ptrStepError) && ((limit_geometry - a) > *ptrStepError))
+			std::cout << "(OK)" << '\n';
+		else 
+			std::cout << "(NOT OK)" << '\n';
+	
+		std::cout << "vRd,max 	   = " << constants::vrdmax << '\n';
+		std::cout << "u(a) 		   = " << u(a, ref) << '\n';
+		std::cout << "A' 		   = " << area(a, ref) << '\n';
+		std::cout << "Ix' 		   = " << I_x(a, ref) << '\n';
+		std::cout << "Iy' 		   = " << I_y(a, ref) << '\n';
+		std::cout << "Wx 		   = " << W_x(a, ref) << '\n';
+		std::cout << "Wy 		   = " << W_y(a, ref) << '\n';
+		
+		double temp_medxred{MEd_x_red(e_x(ref), e_y(ref), area(a, ref), weight(ref), I_x(a, ref), ref)};
+		double temp_medyred{MEd_y_red(e_x(ref), e_y(ref), area(a, ref), weight(ref), I_y(a, ref), ref)};
+		double temp_vedred{VEd_red(e_x(ref), e_y(ref), area(a, ref), weight(ref), ref)};
+		double temp_exred{e_x_red(temp_medxred, temp_vedred)};
+		double temp_eyred{e_y_red(temp_medyred, temp_vedred)};
+		double temp_beta{betaFun(temp_exred, temp_eyred, a, u(a, ref), W_x(a, ref), W_y(a, ref), ref)};
+		double temp_maxved{max_vEd(temp_vedred, u(a, ref), temp_beta, ref)};
+		double temp_vrdc{vRdc(a, ref)};
+
+		std::cout << "MEd,xred(a)        = " << temp_medxred << '\n';
+		std::cout << "MEd,yred(a)        = " << temp_medyred << '\n';
+		std::cout << "Ved,red(a)  	   = " << temp_vedred << '\n';
+		std::cout << "ex,red(a)   	   = " << temp_exred << '\n';
+		std::cout << "ey,red(a)   	   = " << temp_eyred << '\n';
+		std::cout << "beta(a)     	   = " << temp_beta << '\n';
+		std::cout << "vRd,c(a)    	   = " << temp_vrdc << '\n';
+		std::cout << "maxvEd(a)   	   = " << temp_maxved << '\n';
+		std::cout << "vRd,c(a)/maxvEd(a) = " << temp_vrdc / temp_maxved << '\n';
+
+		std::cout << "----------------------------------------------------" << '\n';
+		a += *ptrIncr;
+	}
+ptrIncr = nullptr;
+ptrStepError = nullptr;
 }

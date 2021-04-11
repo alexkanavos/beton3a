@@ -35,6 +35,10 @@ double e_x_red(double medxred, double vedred);
 
 double e_y_red(double medyred, double vedred);
 
-double betaFun(double exred, double eyred, double u, double wx, double wy, double a, const Footingsystem& ref);
+double betaFun(double exred, double eyred, double a, double u, double wx, double wy, const Footingsystem& ref);
+
+double limitFinder(const Footingsystem& ref);
+
+void printer(const Footingsystem& ref);
 
 #endif
