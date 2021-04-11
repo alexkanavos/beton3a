@@ -196,16 +196,15 @@ void printer(const Footingsystem& ref)
 {
 	double a{0.0};
 	const double* ptrIncr{&constants::step};
-	const double* ptrStepError{&constants::stepError};
 	double limit_equation{2.0 * ref.d};
 	double limit_geometry{limitFinder(ref)};
 	
 	while(a <= limit_equation)
 	{
 		
-		std::cout << limit_geometry - a << "Distance from column: [a = " << a << "] --> ";
+		std::cout << "Distance from column: [a = " << a << "] --> ";
 		
-		if (((limit_geometry - a) > *ptrStepError) && ((limit_geometry - a) > *ptrStepError))
+		if (a <= limit_geometry)
 			std::cout << "(OK)" << '\n';
 		else 
 			std::cout << "(NOT OK)" << '\n';
@@ -240,6 +239,6 @@ void printer(const Footingsystem& ref)
 		std::cout << "----------------------------------------------------" << '\n';
 		a += *ptrIncr;
 	}
-ptrIncr = nullptr;
-ptrStepError = nullptr;
+
+	ptrIncr = nullptr;
 }
