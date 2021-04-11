@@ -1,8 +1,6 @@
 #ifndef CALCULATIONS_H
 #define CALCULATIONS_H
 
-void initializer(Footingsystem& ref);
-
 double vRdc(double a, const Footingsystem& ref);
 
 double area(double a, const Footingsystem& ref);

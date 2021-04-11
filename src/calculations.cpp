@@ -4,47 +4,6 @@
 #include <cmath>
 #include <iomanip>
 
-void initializer(Footingsystem& ref)
-{
-	std::cout << "Insert required input values. \n";
-
-	std::cout << "bx   = ";
-    std::cin >> ref.bx;
-    
-    std::cout << "by   = ";
-    std::cin >> ref.by;
-    
-    std::cout << "h    = ";
-    std::cin >> ref.h;
-
-    std::cout << "d    = ";
-    std::cin >> ref.d;
-
-    std::cout << "cx   = ";
-    std::cin >> ref.cx;
-    
-    std::cout << "cy   = ";
-    std::cin >> ref.cy;
-    
-    std::cout << "ax   = ";
-    std::cin >> ref.ax;
-    
-    std::cout << "ay   = ";
-    std::cin >> ref.ay;
-
-    std::cout << "t    = ";
-    std::cin >> ref.t;
-    
-    std::cout << "Mx   = ";
-    std::cin >> ref.Mx;
-    
-    std::cout << "My   = ";
-    std::cin >> ref.My;
-
-    std::cout << "Ntot = ";
-    std::cin >> ref.Ntot;
-}
-
 double vRdc(double a, const Footingsystem& ref)
 {
 	double p1{(0.18/1.5) * std::pow(100.0 * constants::rho1, 1.0/3.0)};
