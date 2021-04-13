@@ -30,7 +30,8 @@ double area(double a, const Footingsystem& ref)
 
 double weight(const Footingsystem& ref)
 {
-	double result{ref.bx * ref.by * ref.h * constants::g_con + constants::g_soil * (ref.bx * ref.by - ref.cx * ref.cy) * (ref.t - ref.h)};
+	double result{ref.bx * ref.by * ref.h * constants::g_con + 
+		constants::g_soil * (ref.bx * ref.by - ref.cx * ref.cy) * (ref.t - ref.h)};
 	return result;
 }
 
@@ -86,13 +87,15 @@ double I_y(double a, const Footingsystem& ref)
 
 double W_x(double a, const Footingsystem& ref)
 {
-	double result{(1.0/2.0) * std::pow(ref.cx, 2) + ref.cx * ref.cy + 2.0 * a * ref.cy + constants::pi * a * ref.cx + 4.0 * std::pow(a, 2)};
+	double result{(1.0/2.0) * std::pow(ref.cx, 2) + ref.cx * ref.cy 
+		+ 2.0 * a * ref.cy + constants::pi * a * ref.cx + 4.0 * std::pow(a, 2)};
 	return result;
 }
 
 double W_y(double a, const Footingsystem& ref)
 {
-	double result{(1.0/2.0) * std::pow(ref.cy, 2) + ref.cx * ref.cy + 2.0 * a * ref.cx + constants::pi * a * ref.cy + 4.0 * std::pow(a, 2)};
+	double result{(1.0/2.0) * std::pow(ref.cy, 2) + ref.cx * ref.cy 
+		+ 2.0 * a * ref.cx + constants::pi * a * ref.cy + 4.0 * std::pow(a, 2)};
 	return result;
 }
 
@@ -132,52 +135,12 @@ double betaFun(double exred, double eyred, double a, double u, double wx, double
 {
 	if (exred > 0 && eyred == 0)
 	{
-		double ratio{ref.cx / ref.cy};
-		if (ratio <= 0.5)
-		{
-			double k{0.45};
-			return 1.0 + k * exred * u * wx;
-		}
-		else if (ratio == 1.0)
-		{
-			double k{0.60};
-			return 1.0 + k * exred * u * wx;
-		}
-		else if (ratio == 2.0)
-		{
-			double k{0.70};
-			return 1.0 + k * exred * u * wx;
-		}
-		else if (ratio >= 3.0)
-		{
-			double k{0.80};
-			return 1.0 + k * exred * u * wx;
-		}
+		// values of k case A (omitted)
 	}
 	
 	else if (exred == 0 && eyred > 0)
 	{
-		double ratio{ref.cy / ref.cx};
-		if (ratio <= 0.5)
-		{
-			double k{0.45};
-			return 1.0 + k * eyred * u * wy;
-		}
-		else if (ratio == 1.0)
-		{
-			double k{0.60};
-			return 1.0 + k * eyred * u * wy;
-		}
-		else if (ratio == 2.0)
-		{
-			double k{0.70};
-			return 1.0 + k * eyred * u * wy;
-		}
-		else if (ratio >= 3.0)
-		{
-			double k{0.80};
-			return 1.0 + k * eyred * u * wy;
-		}
+		// values of k case B (omitted)
 	}
 	
 	else if (exred > 0 && eyred > 0)
@@ -208,7 +171,8 @@ void printer(const Footingsystem& ref)
 	const double* ptrIncr{&constants::step};
 	double limit_equation{2.0 * ref.d};
 	
-	std::cout << "a, u(a), A(a), Vedred(a), Ix(a), Iy(a), MEdxred(a), MEdyred(a), exred(a), eyred(a), beta(a), vRdc(a), maxvEd(a), vRdc(a) / maxvEd(a), vRdmax \n";
+	std::cout << "a, u(a), A(a), Vedred(a), Ix(a), Iy(a), MEdxred(a), MEdyred(a), 
+		exred(a), eyred(a), beta(a), vRdc(a), maxvEd(a), vRdc(a) / maxvEd(a), vRdmax \n";
 	
 	while(a <= limit_equation)
 	{

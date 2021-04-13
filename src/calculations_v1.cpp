@@ -202,16 +202,21 @@ double limitFinder(const Footingsystem& ref)
 
 void printer(const Footingsystem& ref)
 {
-	std::cout << std::fixed;
-    std::cout << std::setprecision(5);
 	double a{0.0};
 	const double* ptrIncr{&constants::step};
 	double limit_equation{2.0 * ref.d};
-	
-	std::cout << "a, u(a), A(a), Vedred(a), Ix(a), Iy(a), MEdxred(a), MEdyred(a), exred(a), eyred(a), beta(a), vRdc(a), maxvEd(a), vRdc(a) / maxvEd(a), vRdmax \n";
+	double limit_geometry{limitFinder(ref)};
 	
 	while(a <= limit_equation)
 	{
+		
+		std::cout << "Distance from column: [a = " << a << "] --> ";
+		
+		if (a <= limit_geometry)
+			std::cout << "(OK)" << '\n';
+		else 
+			std::cout << "(NOT OK)" << '\n';
+	
 		double temp_medxred{MEd_x_red(e_x(ref), e_y(ref), area(a, ref), weight(ref), I_x(a, ref), ref)};
 		double temp_medyred{MEd_y_red(e_x(ref), e_y(ref), area(a, ref), weight(ref), I_y(a, ref), ref)};
 		double temp_vedred{VEd_red(e_x(ref), e_y(ref), area(a, ref), weight(ref), ref)};
@@ -221,9 +226,24 @@ void printer(const Footingsystem& ref)
 		double temp_maxved{max_vEd(temp_vedred, u(a, ref), temp_beta, ref)};
 		double temp_vrdc{vRdc(a, ref)};
 		
-		std::cout << a << ", " << u(a, ref) << ", " << area(a, ref) << ", " << temp_vedred << ", " << I_x(a, ref) << ", " << 
-		I_y(a, ref) << ", " << temp_medxred << ", " << temp_medyred << ", " << temp_exred << ", " << temp_eyred << ", " << 
-		temp_beta << ", " << temp_vrdc << ", " << temp_maxved << ", " << temp_vrdc / temp_maxved << ", " << vRd_max(ref) << '\n';
+		std::cout << "u(a) 		     = " << u(a, ref) << '\n';
+		std::cout << "A'(a)		     = " << area(a, ref) << '\n';
+		std::cout << "Ved,red(a)  	     = " << temp_vedred << '\n';
+		std::cout << "Ix'(a)		     = " << I_x(a, ref) << '\n';
+		std::cout << "Iy'(a)		     = " << I_y(a, ref) << '\n';
+		//std::cout << "Wx 		     = " << W_x(a, ref) << '\n';
+		//std::cout << "Wy 		     = " << W_y(a, ref) << '\n';
+		std::cout << "MEd,xred(a)          = " << temp_medxred << '\n';
+		std::cout << "MEd,yred(a)          = " << temp_medyred << '\n';
+		std::cout << "ex,red(a)   	     = " << temp_exred << '\n';
+		std::cout << "ey,red(a)   	     = " << temp_eyred << '\n';
+		std::cout << "beta(a)     	     = " << temp_beta << '\n';
+		std::cout << "vRd,c(a)    	     = " << temp_vrdc << '\n';
+		std::cout << "maxvEd(a)   	     = " << temp_maxved << '\n';
+		std::cout << "vRd,c(a) / maxvEd(a) = " << temp_vrdc / temp_maxved << '\n';
+		//std::cout << "vRd,max 	     = " << vRd_max(ref) << '\n';
+
+		std::cout << "----------------------------------------------------" << '\n';
 		a += *ptrIncr;
 	}
 
